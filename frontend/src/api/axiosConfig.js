@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://student-job-finder-backend.onrender.com',
+  baseURL: 'https://student-job-finder-server.vercel.app/',
 });
 
 // Add a request interceptor to include JWT token
