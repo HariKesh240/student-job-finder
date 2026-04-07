@@ -14,6 +14,18 @@ function Studentdetails() {
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState([]);
   const [details, setDetails] = useState("");
+  const [resume, setResume] = useState("");
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => setResume(reader.result);
+    } else {
+      alert("Please upload a PDF file");
+    }
+  };
 
   const addSkill = () => {
     if (skillInput.trim() !== "") {
@@ -29,22 +41,23 @@ function Studentdetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const studentData = {
       name,
       skills,
       details,
-      email: user.email // Get email from context
+      resume,
+      email: user.email,
     };
 
     try {
-      await API.put('/addstudent', studentData);
+      await API.put("/addstudent", studentData);
       alert("Profile Created Successfully!");
-      navigate('/studentdashboard'); // Redirect to dashboard
+      navigate("/studentdashboard");
     } catch (err) {
-      alert("Failed to save profile. Please try again.");
+      alert("Failed to save profile.");
     }
   };
+
 
   return (
     <div>
@@ -109,6 +122,11 @@ function Studentdetails() {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+               <Form.Label>Upload Resume (PDF)</Form.Label>
+               <Form.Control type="file" accept=".pdf" onChange={handleFileChange} />
             </Form.Group>
 
             <Button variant="outline-primary" className="w-100" type="submit">

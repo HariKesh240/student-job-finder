@@ -12,6 +12,13 @@ function Admindashboard() {
   fetchApplications(); 
 }, [fetchApplications]);
 
+  const viewResume = (base64String) => {
+    const win = window.open();
+    win.document.write(
+      `<iframe src="${base64String}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
+    );
+  };
+
   const updateStatus = async (id, status) => {
     const comment = window.prompt(`Enter comment for ${status}:`);
     if (comment === null) return; // Cancelled
@@ -61,6 +68,7 @@ function Admindashboard() {
             <th>Skills</th>
             <th>Company</th>
             <th>Role</th>
+            <th>Resume</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -72,6 +80,19 @@ function Admindashboard() {
               <td>{app.studentSkills?.join(", ")}</td>
               <td>{app.companyName}</td>
               <td>{app.role}</td>
+              <td>
+                {app.resume ? (
+                  <Button
+                    size="sm"
+                    variant="outline-info"
+                    onClick={() => viewResume(app.resume)}
+                  >
+                    View PDF
+                  </Button>
+                ) : (
+                  "No Resume"
+                )}
+              </td>
               <td>
                 <Badge bg={app.status === 'Selected' ? 'success' : app.status === 'Rejected' ? 'danger' : 'warning'}>
                   {app.status}

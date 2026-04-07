@@ -29,14 +29,15 @@ function Joblist() {
         companyName: job.companyName,
         role: job.jobRole,
         workType: job.workType,
-        email: user.email
+        email: user.email,
+        resume: student.resume
       };
 
       await API.post('/applyjob', applicationData);
       alert("Applied Successfully!");
       fetchApplications(); // Refresh local application list
     } catch (err) {
-      alert("Error applying. Make sure your profile is complete.");
+      alert("Error applying. Make sure your profile and resume are complete.");
     }
   };
 

@@ -22,7 +22,8 @@ function Studentdashboard() {
     name: "",
     email: "",
     skills: [],
-    details: ""
+    details: "",
+    resume: ""
   });
 
   const handleClose = () => setShow(false);
@@ -41,6 +42,16 @@ function Studentdashboard() {
   const removeSkill = (index) => {
     const updatedSkills = student.skills.filter((_, i) => i !== index);
     setStudent({ ...student, skills: updatedSkills });
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () =>
+        setStudent((prevStudent) => ({ ...prevStudent, resume: reader.result }));
+    }
   };
 
 
@@ -198,6 +209,17 @@ function Studentdashboard() {
                   {skill} ✕
                 </Badge>
               ))}
+            </Form.Group>
+            <Form.Group className="mb-3 mt-3">
+              <Form.Label>Update Resume (PDF)</Form.Label>
+              <Form.Control
+                type="file"
+                accept=".pdf"
+                onChange={handleFileChange}
+              />
+              {student.resume && (
+                <small className="text-success">Resume attached</small>
+              )}
             </Form.Group>
           </Form>
         </Modal.Body>

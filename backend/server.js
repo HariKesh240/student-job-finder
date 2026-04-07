@@ -86,17 +86,18 @@ const StudentSchema = new mongoose.Schema({
     name: String,
     skills: Array,
     email: { type: String, unique: true },
-    details: String
+    details: String,
+    resume: String // Added field for Base64 PDF
 });
 
 const Student = mongoose.model("Student", StudentSchema);
 app.put("/addstudent", async (req, res) => {
-  const { name, skills, email, details } = req.body;
+  const { name, skills, email, details, resume } = req.body;
   
   try {
     const student = await Student.findOneAndUpdate(
       { email }, 
-      { name, skills, details },
+      { name, skills, details, resume }, // Include resume
       { upsert: true, new: true }
     );
     res.json({ message: "Student profile saved successfully", student });
@@ -201,7 +202,8 @@ const CandidateSchema = new mongoose.Schema({
   appliedAt: { type: Date, default: Date.now },
   status: { type: String, default: "Pending" },
   email: String,
-  comment: String // Added comment field
+  comment: String,
+  resume: String // Added field to store resume at time of application
 });
 
 
@@ -215,21 +217,11 @@ app.post("/applyjob", async (req, res) => {
       companyName,
       role,
       workType,
-      email
+      email,
+      resume // Receive resume from frontend
     } = req.body;
 
     const status = "Pending"
-
-    if (
-      !studentName ||
-      !studentSkills ||
-      !companyName ||
-      !role ||
-      !workType ||
-      !email
-    ) {
-      return res.status(400).json({ message: "Error Occured" });
-    }
 
     await Candidate.create({
       studentName,
@@ -238,12 +230,12 @@ app.post("/applyjob", async (req, res) => {
       role,
       workType,
       status,
-      email
+      email,
+      resume // Save resume
     });
 
     res.status(201).json({ message: "Job applied successfully" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
