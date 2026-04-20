@@ -145,7 +145,7 @@ function Studentdashboard() {
                 <p className="fw-bold mt-4">Skills Loadout</p>
 
                 {student.skills.map((skill, index) => (
-                  <Badge key={index}  className="me-2 p-2 rounded-pill custom-badge">
+                  <Badge key={index}  className="me-2 mb-2 p-2 rounded-pill custom-badge">
                     {skill}
                   </Badge>
                 ))}
@@ -153,8 +153,8 @@ function Studentdashboard() {
                   <p className="fw-bold mb-2">Resume</p>
                   {student.resume ? (
                     <>
-                      <div className="text-success mb-2">Latest resume uploaded</div>
-                      <Button variant="outline-info" onClick={openResumePreview}>
+                      <div className="text-muted mb-2">Latest resume uploaded</div>
+                      <Button variant="outline-primary" onClick={openResumePreview}>
                         View Resume
                       </Button>
                     </>
@@ -165,7 +165,7 @@ function Studentdashboard() {
                 <br />
                 <Button
                   variant="outline-primary"
-                  className="mt-4 w-25"
+                  className="mt-2 w-25"
                   onClick={handleShow}
                 >
                   Edit Profile
