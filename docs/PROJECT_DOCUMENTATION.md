@@ -107,9 +107,9 @@ I also thank my friends and classmates for their suggestions and cooperation dur
 
 ## Abstract
 
-Student Job Finder is a full-stack web application developed to simplify the interaction between students looking for job opportunities and recruiters who manage job postings and candidate selection. The system provides a role-based environment where students can create their profile, view available jobs, apply for suitable openings, and track the status of their applications. Recruiters can add and manage job postings, review applicants, and update selection decisions with comments.
+Student Job Finder is a full-stack web application developed to simplify the interaction between students looking for job opportunities and recruiters who manage job postings and candidate selection. The system provides a role-based environment where students can create their profile, upload a PDF resume, view available jobs, apply for suitable openings, and track the status of their applications. Recruiters can add and manage job postings, review applicants, view resumes, and update selection decisions with comments.
 
-The project is implemented using the MERN stack, where React is used for the client-side user interface, Express and Node.js are used for the server-side logic, and MongoDB is used for data storage. Authentication is handled using JWT and password hashing is implemented using bcrypt. The application demonstrates a complete workflow for student recruitment management with separate interfaces for students and recruiters.
+The project is implemented using the MERN stack, where React is used for the client-side user interface, Express and Node.js are used for the server-side logic, and MongoDB is used for data storage. Authentication is handled using JWT and password hashing is implemented using bcrypt. The application demonstrates a complete workflow for student recruitment management with separate interfaces for students and recruiters, plus shared state handling through React Context.
 
 The main objective of the project is to provide a simple, centralized, and efficient placement support platform. The project also serves as a practical demonstration of modern full-stack application development, role-based navigation, REST API integration, and CRUD-based data management.
 
@@ -151,7 +151,7 @@ The project supports:
 5. Application review and status update by recruiters.
 6. Display of recruiter comments and final status to students.
 
-The current scope is limited to a basic hiring workflow and does not yet include advanced features such as resume upload, email notifications, analytics dashboards, interview scheduling, or backend authorization middleware.
+The current scope is limited to a basic hiring workflow and does not yet include advanced features such as email notifications, analytics dashboards, interview scheduling, or backend authorization middleware.
 
 ## 1.5 Technology Stack
 
@@ -276,6 +276,7 @@ Role-based access on the frontend is implemented using a protected route wrapper
 5. JWT generation after successful login.
 6. Persistent authentication using localStorage.
 7. Route-level role restriction in the frontend.
+8. Bearer token attachment in Axios requests.
 
 ### Related Files
 
@@ -294,8 +295,9 @@ Role-based access on the frontend is implemented using a protected route wrapper
 1. Create a student profile after first login.
 2. Add multiple skills dynamically.
 3. Store additional profile details.
-4. Retrieve profile by email.
-5. Update profile from the dashboard modal.
+4. Upload a resume as a Base64-encoded PDF.
+5. Retrieve profile by email.
+6. Update profile from the dashboard modal.
 
 ### Inputs Captured
 
@@ -305,6 +307,7 @@ Role-based access on the frontend is implemented using a protected route wrapper
 | Skills | Array of strings |
 | Email | String |
 | Details | String |
+| Resume | String (Base64 PDF) |
 
 ## 4.4 Student Dashboard Module
 
@@ -346,6 +349,7 @@ Role-based access on the frontend is implemented using a protected route wrapper
 4. Show required skills and package.
 5. Apply to a job using the student's profile.
 6. Disable apply button when already applied in the current UI state.
+7. Send stored resume data with each application.
 
 ## 4.7 Application Review Module
 
@@ -404,7 +408,7 @@ The backend exposes REST endpoints for authentication, student profile managemen
 
 | Method | Endpoint | Purpose | Request Body | Response |
 |---|---|---|---|---|
-| POST | `/applyjob` | Submit application | `studentName`, `studentSkills`, `companyName`, `role`, `workType`, `email` | Success message |
+| POST | `/applyjob` | Submit application | `studentName`, `studentSkills`, `companyName`, `role`, `workType`, `email`, `resume` | Success message |
 | GET | `/getapplications` | Fetch all applications | None | Array of applications |
 | PUT | `/updatestatus/:id` | Update application status and comment | `status`, `comment` | Updated application |
 | DELETE | `/deleteapplication/:id` | Delete application by ID | None | Success message |
@@ -414,6 +418,7 @@ The backend exposes REST endpoints for authentication, student profile managemen
 1. The frontend sends a bearer token through Axios interceptor.
 2. The backend currently does not verify the JWT token on protected routes.
 3. Recruiter-only restrictions are enforced on the frontend, not yet on the backend.
+4. Resume files are stored as Base64 strings in MongoDB rather than in external object storage.
 
 ---
 
@@ -440,6 +445,7 @@ MongoDB is used as the database and Mongoose is used for schema definition and m
 | skills | Array | List of skills |
 | email | String | Unique student email |
 | details | String | Additional profile details |
+| resume | String | Base64-encoded PDF resume |
 
 ## 6.4 Job Collection
 
@@ -513,7 +519,7 @@ MongoDB is used as the database and Mongoose is used for schema definition and m
 3. Secrets are hardcoded in the backend file.
 4. Duplicate application prevention is mainly handled in the frontend.
 5. The backend is written in a single file, reducing maintainability.
-6. No resume upload or document management is included.
+6. Resume upload is supported, but document storage is kept in MongoDB as Base64.
 7. No email or notification system is integrated.
 8. No advanced filtering, sorting, or analytics are available.
 
@@ -522,7 +528,7 @@ MongoDB is used as the database and Mongoose is used for schema definition and m
 1. Add backend authentication middleware for token verification.
 2. Add role-based backend authorization for recruiter-only routes.
 3. Move secrets to environment variables.
-4. Add resume upload and profile image support.
+4. Store resumes in cloud storage instead of Base64 database fields.
 5. Add email notifications for status changes.
 6. Add company-specific recruiter accounts and dashboards.
 7. Add pagination and advanced search filters.

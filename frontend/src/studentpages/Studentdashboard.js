@@ -9,25 +9,27 @@ import { useEffect } from "react";
 import API from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 
-function Studentdashboard() {
+const defaultStudent = {
+  name: "",
+  email: "",
+  skills: [],
+  details: "",
+  resume: "",
+};
 
-   const { user } = useContext(AuthContext);
+function Studentdashboard() {
+  const { user } = useContext(AuthContext);
   const { applications, fetchApplications } = useContext(DataContext);
   const [show, setShow] = useState(false);
+  const [showResumePreview, setShowResumePreview] = useState(false);
   const [skillInput, setSkillInput] = useState("");
   const navigate = useNavigate();
 
-
-  const [student, setStudent] = useState({
-    name: "",
-    email: "",
-    skills: [],
-    details: "",
-    resume: ""
-  });
+  const [student, setStudent] = useState(defaultStudent);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const handleResumePreviewClose = () => setShowResumePreview(false);
 
   const addSkill = () => {
     if (skillInput.trim() !== "") {
@@ -51,17 +53,34 @@ function Studentdashboard() {
       reader.readAsDataURL(file);
       reader.onload = () =>
         setStudent((prevStudent) => ({ ...prevStudent, resume: reader.result }));
+    } else if (file) {
+      alert("Please upload a PDF file");
     }
   };
 
+  const openResumePreview = () => {
+    if (!student.resume) {
+      alert("No resume uploaded yet.");
+      return;
+    }
+    setShowResumePreview(true);
+  };
 
 
   useEffect(() => {
+    if (!user?.email) {
+      return;
+    }
+
     const getStudentProfile = async () => {
       try {
         const res = await API.get(`/getstudent/${user.email}`);
         if (res.data) {
-          setStudent(res.data);
+          setStudent({
+            ...defaultStudent,
+            ...res.data,
+            skills: Array.isArray(res.data.skills) ? res.data.skills : [],
+          });
         }
       } catch (err) {
         console.error("Error fetching profile", err);
@@ -70,13 +89,13 @@ function Studentdashboard() {
 
     getStudentProfile();
     fetchApplications();
-  }, [user.email, fetchApplications]);
+  }, [user?.email, fetchApplications]);
 
  const appliedCount = applications.filter(app => app.email === user.email).length;
 
   const handleUpdate = async () => {
     try {
-      await API.put('/addstudent', student); // Reuse the addstudent route (it upserts)
+      await API.put("/addstudent", student); // Reuse the addstudent route (it upserts)
       alert("Profile Updated!");
       setShow(false);
     } catch (err) {
@@ -130,6 +149,19 @@ function Studentdashboard() {
                     {skill}
                   </Badge>
                 ))}
+                <div className="mt-4">
+                  <p className="fw-bold mb-2">Resume</p>
+                  {student.resume ? (
+                    <>
+                      <div className="text-success mb-2">Latest resume uploaded</div>
+                      <Button variant="outline-info" onClick={openResumePreview}>
+                        View Resume
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="text-muted">No resume uploaded yet</div>
+                  )}
+                </div>
                 <br />
                 <Button
                   variant="outline-primary"
@@ -218,7 +250,9 @@ function Studentdashboard() {
                 onChange={handleFileChange}
               />
               {student.resume && (
-                <small className="text-success">Resume attached</small>
+                <small className="text-success d-block mt-2">
+                  Current resume will be replaced when you click Update
+                </small>
               )}
             </Form.Group>
           </Form>
@@ -232,6 +266,23 @@ function Studentdashboard() {
             Update
           </Button>
         </Modal.Footer>
+      </Modal>
+
+      <Modal show={showResumePreview} onHide={handleResumePreviewClose} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Resume Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ minHeight: "70vh" }}>
+          {student.resume ? (
+            <iframe
+              title="Student Resume Preview"
+              src={student.resume}
+              style={{ width: "100%", height: "70vh", border: "none" }}
+            />
+          ) : (
+            <div className="text-muted">No resume available.</div>
+          )}
+        </Modal.Body>
       </Modal>
 
     </div>
